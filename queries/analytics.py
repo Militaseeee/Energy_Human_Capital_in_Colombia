@@ -23,6 +23,30 @@ from db.connection import get_engine
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# DIAGNÓSTICO — Ver qué valores reales hay en resource_type
+# ─────────────────────────────────────────────────────────────────────────────
+
+@st.cache_data(ttl=600, show_spinner=False)
+def get_resource_types_diagnostico() -> pd.DataFrame:
+    """
+    Retorna los valores únicos de resource_type en fact_energy con su
+    volumen de generación acumulado. Útil para identificar el nombre
+    exacto de los tipos renovables que cargó el ETL de XM.
+    """
+    sql = text("""
+        SELECT
+            resource_type,
+            COUNT(*)                                    AS registros,
+            ROUND(SUM(generation_kwh)::numeric / 1e9, 2) AS gwh_total
+        FROM fact_energy
+        GROUP BY resource_type
+        ORDER BY gwh_total DESC;
+    """)
+    with get_engine().connect() as conn:
+        return pd.read_sql_query(sql, conn)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PESTAÑA 1 — Balance de Coevolución Nacional
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -34,14 +58,27 @@ def get_coevolucion_nacional() -> pd.DataFrame:
       - total_talento_stem         (matrículas universitarias STEM)
       - empleo_energia_miles       (ocupados sector electricidad/gas, en miles)
       - tasa_desempleo_pais        (tasa general de desocupación DANE)
+
+    Tipos renovables cubiertos (ILIKE, insensible a tildes y mayúsculas):
+      HIDRÁULICA · SOLAR · EÓLICA · MENORES · BIOMASA · BAGAZO · GEOTÉRMICA
+    Si el ETL usó un nombre diferente, aparecerá en get_resource_types_diagnostico().
     """
     sql = text("""
         WITH data_energia AS (
             SELECT
                 time_id,
-                SUM(CASE WHEN resource_type = 'RENOVABLE'
-                         THEN generation_kwh ELSE 0 END)  AS energia_limpia_kwh,
-                SUM(generation_kwh)                        AS energia_total_kwh
+                -- Fuentes renovables/limpias según clasificación XM Colombia
+                SUM(CASE
+                    WHEN resource_type ILIKE '%HIDRAUL%'   -- Hidroeléctrica
+                      OR resource_type ILIKE '%SOLAR%'      -- Solar FV
+                      OR resource_type ILIKE '%EOLIC%'      -- Eólica
+                      OR resource_type ILIKE '%MENORES%'    -- Pequeñas centrales
+                      OR resource_type ILIKE '%BIOMASA%'    -- Biomasa
+                      OR resource_type ILIKE '%BAGAZO%'     -- Bagazo (caña)
+                      OR resource_type ILIKE '%GEOTERM%'    -- Geotérmica
+                      OR resource_type ILIKE '%RENOVABLE%'  -- Categoría genérica
+                    THEN generation_kwh ELSE 0 END)          AS energia_limpia_kwh,
+                SUM(generation_kwh)                          AS energia_total_kwh
             FROM fact_energy
             GROUP BY time_id
         ),

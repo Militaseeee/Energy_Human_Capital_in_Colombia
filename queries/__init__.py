@@ -5,6 +5,7 @@ from .analytics import (
     get_mapa_colombia,
     get_top_areas_conocimiento,
     get_modelo_estadistico,
+    get_resource_types_diagnostico,
 )
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "get_mapa_colombia",
     "get_top_areas_conocimiento",
     "get_modelo_estadistico",
+    "get_resource_types_diagnostico",
 ]
