@@ -63,30 +63,35 @@ p, button, input, select, textarea,
 [data-testid="stHeader"]           { background: transparent !important; }
 .main .block-container { padding-top: 0.8rem; padding-bottom: 2.5rem; max-width: 1300px; }
 
-/* ── st.metric — tarjetas ejecutivas ── */
+/* ── st.metric — tarjetas compactas para grid 2×2 ── */
 div[data-testid="metric-container"] {
     background: #0F172A;
-    border-radius: 16px;
-    padding: 1.2rem 1.4rem !important;
+    border-radius: 13px;
+    padding: 0.85rem 0.75rem !important;
     border: 1px solid #1E293B;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     text-align: center;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+div[data-testid="metric-container"]:hover {
+    border-color: #334155;
+    box-shadow: 0 6px 28px rgba(0,0,0,0.5);
 }
 div[data-testid="stMetricValue"] > div {
-    font-size: 1.9rem !important;
+    font-size: 1.5rem !important;
     font-weight: 900 !important;
     color: #F1F5F9 !important;
     letter-spacing: -0.02em;
 }
 div[data-testid="stMetricLabel"] > div {
-    font-size: 0.73rem !important;
+    font-size: 0.66rem !important;
     font-weight: 700 !important;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     color: #64748B !important;
 }
 div[data-testid="stMetricDelta"] > div {
-    font-size: 0.78rem !important;
+    font-size: 0.71rem !important;
     font-weight: 600 !important;
 }
 
@@ -214,131 +219,112 @@ s2 = df_coev.iloc[1] if len(df_coev) > 1 else s1
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# ① BANNER PRINCIPAL
+# HERO — Título + KPIs (izq) · Leyenda + Mapa interactivo (der)
 # ═════════════════════════════════════════════════════════════════════════════
-st.markdown(
-    '<div style="background:linear-gradient(135deg,#020817 0%,#0F172A 50%,#020817 100%);'
-    'border:1px solid #1E293B;border-radius:20px;padding:2rem 2.5rem;margin-bottom:1.5rem">'
-    '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#22D3EE;margin-bottom:0.6rem">'
-    '🇨🇴 Colombia &nbsp;·&nbsp; Minería de Datos &nbsp;·&nbsp; 2023'
-    '</div>'
-    '<h1 style="font-size:2rem;font-weight:900;color:#F1F5F9;margin:0 0 0.5rem 0;line-height:1.2">'
-    '⚡ Coevolución del Capital Humano STEM y el Sector Energético'
-    '</h1>'
-    '<p style="color:#64748B;font-size:0.88rem;margin:0 0 1rem 0;line-height:1.6">'
-    'Análisis multifuente de la sincronía entre la formación universitaria STEM '
-    'y la absorción laboral en el sector eléctrico colombiano.<br>'
-    '<span style="color:#334155">Fuentes oficiales: SNIES &nbsp;·&nbsp; XM S.A. E.S.P. &nbsp;·&nbsp; DANE–GEIH &nbsp;·&nbsp; Banco Mundial</span>'
-    '</p>'
-    '<div style="font-size:0.8rem;color:#475569">'
-    '👩‍💻 <b style="color:#64748B">Camila Acosta &amp; Cristian Robledo</b>'
-    ' &nbsp;|&nbsp; 🏫 <b style="color:#64748B">Talento Tech</b>'
-    ' &nbsp;|&nbsp; Mayo 2026'
-    '</div>'
-    '</div>',
-    unsafe_allow_html=True,
-)
+col_left, col_right = st.columns([1, 1.5], gap="large")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# ② KPI DASHBOARD DE ENTRADA — st.metric con deltas reales S1 → S2
-# ═════════════════════════════════════════════════════════════════════════════
-col1, col2, col3, col4 = st.columns(4, gap="medium")
-
-with col1:
-    val_stem = int(s1["total_talento_stem"]) if s1 is not None else 0
-    delta_stem = int(s2["total_talento_stem"]) - int(s1["total_talento_stem"]) if s2 is not None and s1 is not None else None
-    st.metric(
-        label="🎓 Talento STEM Matriculado",
-        value=f"{val_stem:,}",
-        delta=f"{delta_stem:+,} Sem. 2" if delta_stem is not None else "2023",
+with col_left:
+    # ── Eyebrow + título con gradiente y halo de luz ──────────────────────────
+    st.markdown(
+        '<div style="background:radial-gradient(ellipse at 10% 55%,'
+        'rgba(34,211,238,0.11) 0%,transparent 65%);'
+        'padding:0.6rem 0 1.1rem 0">'
+        '<div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;'
+        'letter-spacing:0.2em;color:#334155;margin-bottom:0.75rem">'
+        '🇨🇴 &nbsp;Minería de Datos &nbsp;·&nbsp; Colombia 2023</div>'
+        '<h1 style="font-size:2.75rem;font-weight:900;line-height:1.1;'
+        'letter-spacing:-0.03em;margin:0 0 0.75rem 0;'
+        'background:linear-gradient(140deg,#FFFFFF 0%,#E2E8F0 22%,'
+        '#22D3EE 62%,#60A5FA 100%);'
+        '-webkit-background-clip:text;-webkit-text-fill-color:transparent;'
+        'background-clip:text">'
+        'Coevolución del Capital Humano STEM y el Sector Energético</h1>'
+        '<p style="color:#64748B;font-size:0.83rem;line-height:1.65;'
+        'margin:0 0 0.35rem">'
+        'Sincronía entre la formación universitaria STEM y la absorción '
+        'laboral en el sector eléctrico colombiano.</p>'
+        '<span style="font-size:0.67rem;color:#334155">'
+        'SNIES &nbsp;·&nbsp; XM S.A. E.S.P. &nbsp;·&nbsp; '
+        'DANE–GEIH &nbsp;·&nbsp; Banco Mundial</span>'
+        '</div>',
+        unsafe_allow_html=True,
     )
 
-with col2:
-    val_emp = float(s1["empleo_energia_miles"]) if s1 is not None else 0
-    delta_emp = (float(s2["empleo_energia_miles"]) - float(s1["empleo_energia_miles"])) if s2 is not None and s1 is not None else None
-    st.metric(
-        label="⚡ Empleo Sector Energía",
-        value=f"{val_emp:.1f} K",
-        delta=f"{delta_emp:+.2f} K Sem. 2" if delta_emp is not None else "Miles",
+    # ── KPIs 2 × 2 ───────────────────────────────────────────────────────────
+    kr1, kr2 = st.columns(2, gap="small")
+    with kr1:
+        val_stem = int(s1["total_talento_stem"]) if s1 is not None else 0
+        delta_stem = (int(s2["total_talento_stem"]) - int(s1["total_talento_stem"])
+                      if s2 is not None and s1 is not None else None)
+        st.metric("🎓 Talento STEM", f"{val_stem:,}",
+                  f"{delta_stem:+,} Sem. 2" if delta_stem is not None else "2023")
+    with kr2:
+        val_emp = float(s1["empleo_energia_miles"]) if s1 is not None else 0
+        delta_emp = (float(s2["empleo_energia_miles"]) - float(s1["empleo_energia_miles"])
+                     if s2 is not None and s1 is not None else None)
+        st.metric("⚡ Empleo Energía", f"{val_emp:.1f} K",
+                  f"{delta_emp:+.2f} K Sem. 2" if delta_emp is not None else "Miles")
+
+    kr3, kr4 = st.columns(2, gap="small")
+    with kr3:
+        val_enl = float(s1["porcentaje_energia_limpia"]) if s1 is not None else 0
+        delta_enl = (float(s2["porcentaje_energia_limpia"]) - float(s1["porcentaje_energia_limpia"])
+                     if s2 is not None and s1 is not None else None)
+        st.metric("🌿 Energía Limpia", f"{val_enl:.2f}%",
+                  f"{delta_enl:+.2f}% Sem. 2" if delta_enl is not None else "2023")
+    with kr4:
+        st.metric("🔗 Correlación r", f"{modelo['r']:.4f}",
+                  "Sincronía Perfecta", delta_color="normal")
+
+with col_right:
+    # ── Leyenda compacta en grilla 2×3 (encima del mapa) ─────────────────────
+    regiones_hero = [
+        (REGION_COLORS["Región Andina"],    "Andina",    "68.54% STEM"),
+        (REGION_COLORS["Región Caribe"],    "Caribe",    "16.47% crítica"),
+        (REGION_COLORS["Región Pacífica"],  "Pacífica",  "Potencial hídrico"),
+        (REGION_COLORS["Región Orinoquía"], "Orinoquía", "En crecimiento"),
+        (REGION_COLORS["Región Amazonía"],  "Amazonía",  "En consolidación"),
+        (REGION_COLORS["Región Insular"],   "Insular",   "Solar/eólico"),
+    ]
+    items_html = "".join(
+        f'<div style="display:flex;align-items:center;gap:0.45rem">'
+        f'<div style="width:8px;height:8px;border-radius:50%;background:{clr};'
+        f'box-shadow:0 0 7px {clr}77;flex-shrink:0"></div>'
+        f'<div><span style="font-size:0.78rem;font-weight:700;color:#CBD5E1">{nombre}</span>'
+        f'<span style="font-size:0.71rem;color:#475569"> — {desc}</span></div></div>'
+        for clr, nombre, desc in regiones_hero
+    )
+    st.markdown(
+        f'<div style="display:grid;grid-template-columns:1fr 1fr;'
+        f'gap:0.28rem 0.9rem;margin-bottom:0.55rem">{items_html}</div>',
+        unsafe_allow_html=True,
     )
 
-with col3:
-    val_enl = float(s1["porcentaje_energia_limpia"]) if s1 is not None else 0
-    delta_enl = (float(s2["porcentaje_energia_limpia"]) - float(s1["porcentaje_energia_limpia"])) if s2 is not None and s1 is not None else None
-    st.metric(
-        label="🌿 Energía Limpia (Renovable)",
-        value=f"{val_enl:.2f}%",
-        delta=f"{delta_enl:+.2f}% Sem. 2" if delta_enl is not None else "2023",
+    # ── Alerta compacta ───────────────────────────────────────────────────────
+    st.markdown(
+        '<div style="background:#1a0a0a;border:1px solid #7F1D1D;'
+        'border-left:4px solid #F87171;border-radius:10px;'
+        'padding:0.6rem 1rem;margin-bottom:0.5rem">'
+        '<span style="font-weight:700;color:#FCA5A5;font-size:0.82rem">'
+        '🚨 Brecha Territorial — </span>'
+        '<span style="color:#FCA5A5;font-size:0.79rem">'
+        'La <b>Región Andina</b> concentra el <b>68.54%</b> del talento '
+        'mientras parques eólicos y solares se construyen en el '
+        '<b>Caribe (16.47%)</b>.</span></div>',
+        unsafe_allow_html=True,
     )
 
-with col4:
-    st.metric(
-        label="🔗 Correlación de Pearson (r)",
-        value=f"{modelo['r']:.4f}",
-        delta="Sincronía Perfecta",
-        delta_color="normal",
-    )
-
-_gradient_divider()
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# ③ HERO SECTION — Mapa de Colombia + descripción
-# ═════════════════════════════════════════════════════════════════════════════
-col_mapa, col_desc = st.columns([1.7, 1], gap="large")
-
-with col_mapa:
-    fig_hero = chart_mapa_hero(df_mapa)
+    # ── Mapa coroplético interactivo ──────────────────────────────────────────
+    fig_hero = chart_mapa_colombia(df_mapa, height=490, show_title=False)
     if fig_hero is not None:
         st.plotly_chart(fig_hero, use_container_width=True)
     else:
         st.markdown(
-            '<div style="background:#0F172A;border:1px dashed #334155;border-radius:16px;'
-            'padding:3rem;text-align:center;color:#475569">'
+            '<div style="background:#0F172A;border:1px dashed #334155;'
+            'border-radius:16px;padding:3rem;text-align:center;color:#475569">'
             '🗺️ Mapa no disponible sin conexión a internet</div>',
             unsafe_allow_html=True,
         )
-
-with col_desc:
-    st.markdown('<div style="height:2rem"></div>', unsafe_allow_html=True)
-
-    st.markdown(
-        '<h3 style="font-size:1.1rem;font-weight:800;color:#F1F5F9;margin-bottom:0.8rem">'
-        '🗺️ ¿Qué muestra el mapa?</h3>'
-        '<p style="color:#94A3B8;font-size:0.87rem;line-height:1.7;margin-bottom:1.2rem">'
-        'Cada departamento está coloreado según su <b style="color:#F1F5F9">macro-región natural</b>. '
-        'El tamaño e intensidad refleja la concentración del talento STEM universitario en el territorio colombiano.'
-        '</p>',
-        unsafe_allow_html=True,
-    )
-
-    # Mini cards de regiones con color
-    regiones_info = [
-        (REGION_COLORS["Región Andina"],    "Región Andina",    "68.54% del talento STEM"),
-        (REGION_COLORS["Región Caribe"],    "Región Caribe",    "16.47% — brecha crítica"),
-        (REGION_COLORS["Región Pacífica"],  "Región Pacífica",  "Potencial hídrico"),
-        (REGION_COLORS["Región Orinoquía"], "Región Orinoquía", "Llanura en crecimiento"),
-        (REGION_COLORS["Región Amazonía"],  "Región Amazonía",  "En consolidación"),
-        (REGION_COLORS["Región Insular"],   "Región Insular",   "Potencial solar/eólico"),
-    ]
-    for color, nombre, desc in regiones_info:
-        st.markdown(
-            f'<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.45rem">'
-            f'<div style="width:10px;height:10px;border-radius:50%;background:{color};flex-shrink:0"></div>'
-            f'<div>'
-            f'<span style="font-size:0.8rem;font-weight:700;color:#F1F5F9">{nombre}</span>'
-            f'<span style="font-size:0.75rem;color:#475569"> &mdash; {desc}</span>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown('<div style="height:0.8rem"></div>', unsafe_allow_html=True)
-    st.markdown(_alert(
-        "Brecha Territorial",
-        "La <b>Región Andina concentra el 68.54%</b> del talento mientras los parques "
-        "eólicos y solares se construyen en el <b>Caribe (16.47%)</b>.",
-    ), unsafe_allow_html=True)
 
 _gradient_divider()
 
