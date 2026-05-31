@@ -152,10 +152,10 @@ def get_coevolucion_nacional() -> pd.DataFrame:
 # ─────────────────────────────────────────────────────────────────────────────
 
 @st.cache_data(ttl=600, show_spinner="🗺️ Cargando Distribución Regional…")
-def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
+def get_distribucion_regional(year: int, semester: int) -> pd.DataFrame:
     """
     Participación porcentual del talento STEM por macro-región
-    para el semestre indicado (1 o 2) del año 2023.
+    para un año y semestre específicos (ej. 2023, 1).
     """
     sql = text("""
         SELECT
@@ -168,7 +168,7 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
                     (SELECT SUM(fe2.stem_enrolled)
                      FROM   fact_education fe2
                      INNER JOIN dim_time t2 ON t2.time_id = fe2.time_id
-                     WHERE  t2.year IN (2022, 2023, 2024)
+                     WHERE  t2.year = :year
                        AND  t2.semester = :semester),
                     0
                 ) * 100,
@@ -177,13 +177,13 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
         FROM dim_time t
         INNER JOIN fact_education ed ON ed.time_id = t.time_id
         INNER JOIN dim_region r      ON r.region_id = ed.region_id
-        WHERE t.year IN (2022, 2023, 2024)
+        WHERE t.year = :year
           AND t.semester = :semester
-        GROUP BY r.region_name, ed.time_id
+        GROUP BY r.region_name
         ORDER BY estudiantes_matriculados DESC;
     """)
     with get_engine().connect() as conn:
-        return pd.read_sql_query(sql, conn, params={"semester": semester})
+        return pd.read_sql_query(sql, conn, params={"year": year, "semester": semester})
 
 
 @st.cache_data(ttl=600, show_spinner="🗺️ Cargando datos para mapa de Colombia…")
