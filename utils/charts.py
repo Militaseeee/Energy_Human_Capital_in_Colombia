@@ -225,8 +225,8 @@ def chart_coevolucion(df: pd.DataFrame) -> go.Figure:
 # ─────────────────────────────────────────────────────────────────────────────
 # GRÁFICO 2B — Dona fallback (Tab 2)
 # ─────────────────────────────────────────────────────────────────────────────
-def chart_distribucion_regional(df: pd.DataFrame) -> go.Figure:
-    pulls = [0.10 if "Andina" in str(r) else 0.0 for r in df["macro_region"]]
+def chart_distribucion_regional(df: pd.DataFrame, selected: str = "") -> go.Figure:
+    pulls = [0.06 if selected and selected in str(r) else 0.0 for r in df["macro_region"]]
 
     fig = px.pie(
         df,

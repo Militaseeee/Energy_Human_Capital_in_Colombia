@@ -191,7 +191,8 @@ def render_tab_regional(df_coev, df_mapa, pct_andina: float, pct_caribe: float) 
         if not df_reg.empty:
             _ph_dona = st.empty()
             _ph_dona.markdown(skeleton(340), unsafe_allow_html=True)
-            _ph_dona.plotly_chart(chart_distribucion_regional(df_reg), use_container_width=True)
+            _region_sel = st.session_state.get("t2_reg", "")
+            _ph_dona.plotly_chart(chart_distribucion_regional(df_reg, selected=_region_sel), use_container_width=True)
 
     with col_det:
         if not df_reg.empty:
