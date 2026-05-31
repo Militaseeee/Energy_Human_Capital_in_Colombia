@@ -12,6 +12,7 @@ Estructura visual:
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 # ── set_page_config SIEMPRE primero ──────────────────────────────────────────
 st.set_page_config(
@@ -240,11 +241,27 @@ pct_caribe  = _get_pct(df_s1, "Caribe")
 col_left, col_right = st.columns([1, 1.5], gap="large")
 
 with col_left:
-    # ── Eyebrow + título con gradiente y halo difuminado ─────────────────────
+    _leg_items = [
+        (REGION_COLORS["Región Andina"],    "Región Andina",    f"{pct_andina:.2f}% del talento STEM"),
+        (REGION_COLORS["Región Caribe"],    "Región Caribe",    f"{pct_caribe:.2f}% — brecha crítica"),
+        (REGION_COLORS["Región Pacífica"],  "Región Pacífica",  "Potencial hídrico"),
+        (REGION_COLORS["Región Orinoquía"], "Región Orinoquía", "Llanura en crecimiento"),
+        (REGION_COLORS["Región Amazonía"],  "Región Amazonía",  "En consolidación"),
+        (REGION_COLORS["Región Insular"],   "Región Insular",   "Potencial solar/eólico"),
+    ]
+    _leg_html = "".join(
+        f'<div style="display:flex;align-items:center;gap:0.55rem;margin-bottom:0.42rem">'
+        f'<div style="width:9px;height:9px;border-radius:50%;background:{clr};'
+        f'box-shadow:0 0 8px {clr}88;flex-shrink:0"></div>'
+        f'<span style="font-size:0.8rem;font-weight:700;color:#CBD5E1">{nombre}</span>'
+        f'<span style="font-size:0.72rem;color:#475569"> — {desc}</span>'
+        f'</div>'
+        for clr, nombre, desc in _leg_items
+    )
     st.markdown(
+        # ── Título ────────────────────────────────────────────────────────────
         '<div style="background:radial-gradient(ellipse at 10% 50%,'
-        'rgba(34,211,238,0.12) 0%,transparent 65%);'
-        'padding:0.5rem 0 1rem 0">'
+        'rgba(34,211,238,0.12) 0%,transparent 65%);padding:0.5rem 0 1rem 0">'
         '<div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;'
         'letter-spacing:0.2em;color:#334155;margin-bottom:0.75rem">'
         '🇨🇴 &nbsp;Minería de Datos &nbsp;·&nbsp; Serie Histórica 2022-2024</div>'
@@ -255,43 +272,29 @@ with col_left:
         '-webkit-background-clip:text;-webkit-text-fill-color:transparent;'
         'background-clip:text">'
         'Coevolución del Capital Humano STEM y el Sector Energético</h1>'
-        '<p style="color:#64748B;font-size:0.83rem;line-height:1.65;'
-        'margin:0 0 0.3rem">'
+        '<p style="color:#64748B;font-size:0.83rem;line-height:1.65;margin:0 0 0.3rem">'
         'Sincronía entre la formación universitaria STEM y la absorción '
         'laboral en el sector eléctrico colombiano.</p>'
         '<span style="font-size:0.67rem;color:#334155">'
         'SNIES &nbsp;·&nbsp; XM S.A. E.S.P. &nbsp;·&nbsp; '
         'DANE–GEIH &nbsp;·&nbsp; Banco Mundial</span>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    # ── Separador fino ────────────────────────────────────────────────────────
-    st.markdown(
+        '</div>'
+        # ── Separador ─────────────────────────────────────────────────────────
         '<div style="height:1px;background:linear-gradient(to right,'
-        '#1E293B,#22D3EE44,#1E293B);margin:0.1rem 0 0.75rem"></div>',
+        '#1E293B,#22D3EE44,#1E293B);margin:1.5rem 0 1.1rem"></div>'
+        # ── Texto del mapa ────────────────────────────────────────────────────
+        '<div style="margin-bottom:0.5rem">'
+        '<div style="font-size:1.1rem;font-weight:700;color:#22D3EE;margin-top:2rem;margin-bottom:1rem">'
+        '🗺️ ¿Qué muestra el mapa?</div>'
+        '<div style="font-size:0.77rem;color:#64748B;line-height:1.6;margin-bottom:2rem">'
+        'Cada departamento está coloreado según su macro-región natural. '
+        'El color refleja la concentración del talento STEM universitario '
+        'en el territorio colombiano.</div>'
+        '</div>'
+        # ── Leyenda — data-hero-legend para que el JS la encuentre ────────────
+        f'<div data-hero-legend>{_leg_html}</div>',
         unsafe_allow_html=True,
     )
-
-    # ── Leyenda de macro-regiones (lista vertical con glow) ──────────────────
-    regiones_hero = [
-        (REGION_COLORS["Región Andina"],    "Región Andina",    f"{pct_andina:.2f}% del talento STEM"),
-        (REGION_COLORS["Región Caribe"],    "Región Caribe",    f"{pct_caribe:.2f}% — brecha crítica"),
-        (REGION_COLORS["Región Pacífica"],  "Región Pacífica",  "Potencial hídrico"),
-        (REGION_COLORS["Región Orinoquía"], "Región Orinoquía", "Llanura en crecimiento"),
-        (REGION_COLORS["Región Amazonía"],  "Región Amazonía",  "En consolidación"),
-        (REGION_COLORS["Región Insular"],   "Región Insular",   "Potencial solar/eólico"),
-    ]
-    for clr, nombre, desc in regiones_hero:
-        st.markdown(
-            f'<div style="display:flex;align-items:center;gap:0.55rem;margin-bottom:0.42rem">'
-            f'<div style="width:9px;height:9px;border-radius:50%;background:{clr};'
-            f'box-shadow:0 0 8px {clr}88;flex-shrink:0"></div>'
-            f'<span style="font-size:0.8rem;font-weight:700;color:#CBD5E1">{nombre}</span>'
-            f'<span style="font-size:0.72rem;color:#475569"> — {desc}</span>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
 
 with col_right:
     # ── KPIs en una sola fila (4 columnas) ───────────────────────────────────
@@ -333,7 +336,7 @@ with col_right:
 
     # ── Alerta debajo del mapa ────────────────────────────────────────────────
     st.markdown(
-        '<div style="background:#1a0a0a;border-width:1px 1px 1px 4px;'
+        '<div data-hero-alert style="background:#1a0a0a;border-width:1px 1px 1px 4px;'
         'border-style:solid;border-color:#7F1D1D #7F1D1D #7F1D1D #F87171;'
         'border-radius:10px;padding:0.6rem 1rem;margin-top:0.1rem">'
         '<span style="font-weight:700;color:#FCA5A5;font-size:0.82rem">'
@@ -347,6 +350,36 @@ with col_right:
 
 _gradient_divider()
 
+# ── JS: alinea "Región Insular" con el fondo del alert card ──────────────────
+components.html("""
+<script>
+(function () {
+    var doc = window.parent.document;
+
+    function align() {
+        var alertEl  = doc.querySelector('[data-hero-alert]');
+        var legendEl = doc.querySelector('[data-hero-legend]');
+        if (!alertEl || !legendEl) return;
+
+        legendEl.style.marginTop = '0px';          // reset
+        requestAnimationFrame(function () {
+            var gap = alertEl.getBoundingClientRect().bottom
+                    - legendEl.getBoundingClientRect().bottom;
+            if (gap > 2) legendEl.style.marginTop = Math.round(gap) + 'px';
+        });
+    }
+
+    setTimeout(align, 400);
+    setTimeout(align, 1100);
+
+    var t;
+    window.parent.addEventListener('resize', function () {
+        clearTimeout(t);
+        t = setTimeout(align, 250);
+    });
+})();
+</script>
+""", height=0)
 
 # ═════════════════════════════════════════════════════════════════════════════
 # ④ PESTAÑAS DE ANÁLISIS
