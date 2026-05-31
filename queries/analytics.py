@@ -115,8 +115,8 @@ def get_coevolucion_nacional() -> pd.DataFrame:
         LEFT JOIN data_energia   en ON en.time_id = t.time_id
         LEFT JOIN data_educacion ed ON ed.time_id = t.time_id
         LEFT JOIN data_empleo    em ON em.time_id = t.time_id
-        WHERE t.year = 2023
-        ORDER BY t.semester;
+        WHERE t.year IN (2022, 2023, 2024)
+        ORDER BY t.year, t.semester;
     """)
     with get_engine().connect() as conn:
         return pd.read_sql_query(sql, conn)
@@ -143,7 +143,7 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
                     (SELECT SUM(fe2.stem_enrolled)
                      FROM   fact_education fe2
                      INNER JOIN dim_time t2 ON t2.time_id = fe2.time_id
-                     WHERE  t2.year = 2023
+                     WHERE  t2.year IN (2022, 2023, 2024)
                        AND  t2.semester = :semester),
                     0
                 ) * 100,
@@ -152,7 +152,7 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
         FROM dim_time t
         INNER JOIN fact_education ed ON ed.time_id = t.time_id
         INNER JOIN dim_region r      ON r.region_id = ed.region_id
-        WHERE t.year = 2023
+        WHERE t.year IN (2022, 2023, 2024)
           AND t.semester = :semester
         GROUP BY r.region_name, ed.time_id
         ORDER BY estudiantes_matriculados DESC;
@@ -177,7 +177,7 @@ def get_mapa_colombia() -> pd.DataFrame:
         FROM dim_region r
         LEFT JOIN fact_education ed ON ed.region_id = r.region_id
         LEFT JOIN dim_time t        ON t.time_id = ed.time_id
-            AND t.year = 2023
+            AND t.year IN (2022, 2023, 2024)
         WHERE r.region_name NOT ILIKE '%Consolidado%'
         GROUP BY r.departments, r.region_name
         ORDER BY total_stem DESC;
@@ -203,7 +203,7 @@ def get_top_areas_conocimiento() -> pd.DataFrame:
             RANK() OVER (ORDER BY SUM(ed.stem_enrolled) DESC)      AS ranking_nacional
         FROM fact_education ed
         INNER JOIN dim_time t ON t.time_id = ed.time_id
-        WHERE t.year = 2023
+        WHERE t.year IN (2022, 2023, 2024)
         GROUP BY ed.field_of_study
         ORDER BY total_estudiantes DESC
         LIMIT 10;
@@ -244,8 +244,8 @@ def get_modelo_estadistico() -> dict:
         FROM dim_time t
         LEFT JOIN data_educacion ed ON ed.time_id = t.time_id
         LEFT JOIN data_empleo    em ON em.time_id = t.time_id
-        WHERE t.year = 2023
-        ORDER BY t.semester;
+        WHERE t.year IN (2022, 2023, 2024)
+        ORDER BY t.year, t.semester;
     """)
     with get_engine().connect() as conn:
         df = pd.read_sql_query(sql, conn)
