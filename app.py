@@ -62,7 +62,7 @@ p, button, input, select, textarea,
 /* ── Fondos ── */
 [data-testid="stAppViewContainer"] { background: #020817 !important; }
 [data-testid="stHeader"]           { background: transparent !important; }
-.main .block-container { padding: 0.8rem 1rem 0.8rem; max-width: 1300px; }
+[data-testid="stMainBlockContainer"] { padding-bottom: 6rem !important; }
 
 /* ── st.metric — tarjetas compactas para grid 2×2 ── */
 div[data-testid="metric-container"] {
@@ -209,13 +209,26 @@ def _cargar_todo():
         get_modelo_estadistico(),
     )
 
-with st.spinner("Conectando con Supabase…"):
-    try:
-        df_coev, df_s1, df_s2, df_mapa, df_top, modelo = _cargar_todo()
-        st.toast("Datos cargados ✓", icon="⚡")
-    except Exception as exc:
-        st.error(f"**No se pudo conectar con Supabase.**\n\n`{exc}`")
-        st.stop()
+_loader = st.empty()
+_loader.markdown("""
+<div style="position:fixed;inset:0;z-index:9999;background:#020817;
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem">
+  <div style="width:56px;height:56px;border-radius:50%;
+  border:4px solid #1E293B;border-top-color:#22D3EE;
+  animation:spin 0.9s linear infinite"></div>
+  <div style="font-size:0.95rem;font-weight:600;color:#64748B;letter-spacing:0.05em">
+    Conectando con Supabase…</div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+""", unsafe_allow_html=True)
+try:
+    df_coev, df_s1, df_s2, df_mapa, df_top, modelo = _cargar_todo()
+    st.toast("Datos cargados ✓", icon="⚡")
+except Exception as exc:
+    _loader.empty()
+    st.error(f"**No se pudo conectar con Supabase.**\n\n`{exc}`")
+    st.stop()
+_loader.empty()
 
 # Extraer filas dinámicamente (los dos últimos semestres registrados en la BD)
 if len(df_coev) >= 2:
