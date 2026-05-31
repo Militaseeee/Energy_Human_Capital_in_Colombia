@@ -152,9 +152,14 @@ def render_tab_regional(df_coev, df_mapa, pct_andina: float, pct_caribe: float) 
             ), unsafe_allow_html=True)
 
     # ── Filtro de periodo ─────────────────────────────────────────────────────
-    _section_header(
-        "FILTRO DE PERIODO",
-        "Selecciona un año y semestre específico para ver la distribución de ese periodo.",
+    st.markdown(
+        '<div style="margin:1.8rem 0 0.6rem">'
+        '<p style="font-size:1rem;font-weight:700;color:#F1F5F9;margin:0 0 0.2rem">🗓️ Explora por periodo académico</p>'
+        '<p style="font-size:0.8rem;color:#64748B;margin-bottom:0.7rem 0 0;line-height:1.6">'
+        'Elige un año y semestre para ver cómo se distribuía el talento STEM entre las regiones en ese momento. '
+        'Esto permite identificar si las brechas han mejorado, empeorado o persisten a lo largo del tiempo.</p>'
+        '</div>',
+        unsafe_allow_html=True,
     )
     periodos = [
         (int(r["year"]), int(r["semester"]))
@@ -179,13 +184,8 @@ def render_tab_regional(df_coev, df_mapa, pct_andina: float, pct_caribe: float) 
 
     with col_dona:
         st.markdown(
-            '<p style="font-size:0.62rem;font-weight:700;text-transform:uppercase;'
-            'letter-spacing:0.14em;color:#334155;margin:0 0 0.5rem">📊 ANÁLISIS POR REGIÓN</p>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            f'<p style="font-size:0.75rem;font-weight:600;color:#64748B;margin-bottom:0.2rem">'
-            f'Participación % · {year_sel} Sem. {sem_sel}</p>',
+            '<p style="font-size:0.87rem;font-weight:700;color:#94A3B8;margin:0 0 0.5rem">'
+            '📊 Análisis por región</p>',
             unsafe_allow_html=True,
         )
         if not df_reg.empty:
@@ -194,11 +194,6 @@ def render_tab_regional(df_coev, df_mapa, pct_andina: float, pct_caribe: float) 
             _ph_dona.plotly_chart(chart_distribucion_regional(df_reg), use_container_width=True)
 
     with col_det:
-        st.markdown(
-            '<p style="font-size:0.75rem;font-weight:600;color:#64748B;margin-bottom:0.2rem">'
-            '🔎 Detalle por región</p>',
-            unsafe_allow_html=True,
-        )
         if not df_reg.empty:
             reg_sel = st.selectbox(
                 "Región:",
