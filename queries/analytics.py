@@ -46,6 +46,34 @@ def get_resource_types_diagnostico() -> pd.DataFrame:
         return pd.read_sql_query(sql, conn)
 
 
+@st.cache_data(ttl=600, show_spinner=False)
+def get_time_alignment_diagnostico() -> dict:
+    """
+    Compara time_ids entre fact_energy y dim_time para detectar desalineaciones.
+    Retorna muestras de IDs de cada tabla y el conteo de registros que coinciden.
+    """
+    sql_fe = text("SELECT DISTINCT time_id FROM fact_energy ORDER BY time_id LIMIT 8;")
+    sql_dt = text(
+        "SELECT time_id, year, semester FROM dim_time "
+        "WHERE year IN (2022,2023,2024) ORDER BY time_id;"
+    )
+    sql_match = text("""
+        SELECT COUNT(*) AS registros_coincidentes
+        FROM fact_energy fe
+        INNER JOIN dim_time t ON t.time_id = fe.time_id
+        WHERE t.year IN (2022, 2023, 2024);
+    """)
+    with get_engine().connect() as conn:
+        df_fe    = pd.read_sql_query(sql_fe,    conn)
+        df_dt    = pd.read_sql_query(sql_dt,    conn)
+        df_match = pd.read_sql_query(sql_match, conn)
+    return {
+        "fact_energy_ids":       df_fe,
+        "dim_time_ids":          df_dt,
+        "registros_coincidentes": int(df_match["registros_coincidentes"].iloc[0]),
+    }
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # PESTAÑA 1 — Balance de Coevolución Nacional
 # ─────────────────────────────────────────────────────────────────────────────
@@ -53,34 +81,37 @@ def get_resource_types_diagnostico() -> pd.DataFrame:
 @st.cache_data(ttl=600, show_spinner="⚡ Consultando Balance de Coevolución Nacional…")
 def get_coevolucion_nacional() -> pd.DataFrame:
     """
-    Métricas cruzadas del año 2023 por semestre:
-      - porcentaje_energia_limpia  (% de generación renovable sobre total)
+    Métricas cruzadas 2022-2024 por semestre:
+      - porcentaje_energia_limpia  (% global de generación renovable sobre total)
       - total_talento_stem         (matrículas universitarias STEM)
       - empleo_energia_miles       (ocupados sector electricidad/gas, en miles)
       - tasa_desempleo_pais        (tasa general de desocupación DANE)
 
-    Tipos renovables cubiertos (ILIKE, insensible a tildes y mayúsculas):
-      HIDRÁULICA · SOLAR · EÓLICA · MENORES · BIOMASA · BAGAZO · GEOTÉRMICA
-    Si el ETL usó un nombre diferente, aparecerá en get_resource_types_diagnostico().
+    NOTA: el porcentaje de energía limpia se calcula sobre todos los registros de
+    fact_energy (sin filtrar por time_id) porque el ETL de XM puede haber cargado
+    datos con granularidad diaria cuyos time_id difieren de los semestrales de dim_time.
     """
     sql = text("""
         WITH data_energia AS (
+            -- Porcentaje global de energía limpia — evita el mismatch de time_id
+            -- entre fact_energy (posiblemente diario) y dim_time (semestral).
             SELECT
-                time_id,
-                -- Fuentes renovables/limpias según clasificación XM Colombia
-                SUM(CASE
-                    WHEN resource_type ILIKE '%HIDRAUL%'   -- Hidroeléctrica
-                      OR resource_type ILIKE '%SOLAR%'      -- Solar FV
-                      OR resource_type ILIKE '%EOLIC%'      -- Eólica
-                      OR resource_type ILIKE '%MENORES%'    -- Pequeñas centrales
-                      OR resource_type ILIKE '%BIOMASA%'    -- Biomasa
-                      OR resource_type ILIKE '%BAGAZO%'     -- Bagazo (caña)
-                      OR resource_type ILIKE '%GEOTERM%'    -- Geotérmica
-                      OR resource_type ILIKE '%RENOVABLE%'  -- Categoría genérica
-                    THEN generation_kwh ELSE 0 END)          AS energia_limpia_kwh,
-                SUM(generation_kwh)                          AS energia_total_kwh
+                ROUND(
+                    SUM(CASE
+                        WHEN resource_type ILIKE '%HIDRAUL%'
+                          OR resource_type ILIKE '%SOLAR%'
+                          OR resource_type ILIKE '%EOLIC%'
+                          OR resource_type ILIKE '%MENORES%'
+                          OR resource_type ILIKE '%BIOMASA%'
+                          OR resource_type ILIKE '%BAGAZO%'
+                          OR resource_type ILIKE '%GEOTERM%'
+                          OR resource_type ILIKE '%RENOVABLE%'
+                        THEN generation_kwh ELSE 0 END
+                    )::numeric * 100
+                    / NULLIF(SUM(generation_kwh)::numeric, 0),
+                    2
+                ) AS porcentaje_energia_limpia
             FROM fact_energy
-            GROUP BY time_id
         ),
         data_educacion AS (
             SELECT
@@ -102,17 +133,11 @@ def get_coevolucion_nacional() -> pd.DataFrame:
         SELECT
             t.year,
             t.semester,
-            ROUND(
-                COALESCE(
-                    (en.energia_limpia_kwh / NULLIF(en.energia_total_kwh, 0)) * 100,
-                    0
-                )::numeric, 2
-            )                                                         AS porcentaje_energia_limpia,
-            COALESCE(ed.estudiantes_stem, 0)                          AS total_talento_stem,
-            ROUND(COALESCE(em.ocupados_sector_miles::numeric, 0), 2)  AS empleo_energia_miles,
-            ROUND(COALESCE(em.tasa_desempleo_general::numeric, 0), 2) AS tasa_desempleo_pais
+            (SELECT porcentaje_energia_limpia FROM data_energia)              AS porcentaje_energia_limpia,
+            COALESCE(ed.estudiantes_stem, 0)                                  AS total_talento_stem,
+            ROUND(COALESCE(em.ocupados_sector_miles::numeric, 0), 2)          AS empleo_energia_miles,
+            ROUND(COALESCE(em.tasa_desempleo_general::numeric, 0), 2)         AS tasa_desempleo_pais
         FROM dim_time t
-        LEFT JOIN data_energia   en ON en.time_id = t.time_id
         LEFT JOIN data_educacion ed ON ed.time_id = t.time_id
         LEFT JOIN data_empleo    em ON em.time_id = t.time_id
         WHERE t.year IN (2022, 2023, 2024)

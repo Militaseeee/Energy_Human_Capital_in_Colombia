@@ -185,7 +185,15 @@ def _insight(titulo: str, cuerpo: str) -> str:
         '</div>'
     )
 
-def _card_metrica(icon: str, value: str, label: str, sublabel: str, color: str) -> str:
+def _card_metrica(icon: str, value: str, label: str, sublabel: str, color: str, explain: str = "") -> str:
+    _det = (
+        f'<details style="margin-top:0.65rem;border-top:1px solid #1E293B;padding-top:0.45rem">'
+        f'<summary style="cursor:pointer;font-size:0.65rem;color:#475569;font-weight:600;'
+        f'outline:none;display:flex;align-items:center;justify-content:center;gap:0.3rem">'
+        f'<span class="card-arrow">▶</span> ¿Qué es esto?</summary>'
+        f'<p style="font-size:0.7rem;color:#64748B;line-height:1.55;margin:0.45rem 0 0;text-align:left">'
+        f'{explain}</p></details>'
+    ) if explain else ""
     return (
         f'<div style="background:#0F172A;border-radius:16px;padding:1.4rem 1rem;'
         f'border-top:4px solid {color};box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center">'
@@ -194,7 +202,7 @@ def _card_metrica(icon: str, value: str, label: str, sublabel: str, color: str) 
         f'<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:0.07em;color:#F1F5F9;margin-top:0.5rem">{label}</div>'
         f'<div style="font-size:0.7rem;color:#64748B;margin-top:0.12rem">{sublabel}</div>'
-        f'</div>'
+        f'{_det}</div>'
     )
 
 def _skeleton(height: int = 400) -> str:
@@ -462,20 +470,24 @@ with tab1:
 
     if fila is not None:
         mc1, mc2, mc3, mc4 = st.columns(4, gap="medium")
-        for col, ico, val, lbl, sub, color in [
+        for col, ico, val, lbl, sub, color, exp in [
             (mc1, "🌿", f"{float(fila['porcentaje_energia_limpia']):.2f}%",
-             "Energía Limpia",    "Generación renovable",       C["green"]),
+             "Energía Limpia", "Generación renovable", C["green"],
+             "Porcentaje de la electricidad colombiana producida por fuentes renovables: hidráulica, solar, eólica y biomasa. Fuente: XM S.A. E.S.P."),
             (mc2, "🎓", f"{int(fila['total_talento_stem']):,}",
-             "Talento STEM",      "Matrículas universitarias",  C["blue"]),
+             "Talento STEM", "Matrículas universitarias", C["blue"],
+             "Total de estudiantes matriculados en carreras de Ciencias, Tecnología, Ingeniería y Matemáticas en universidades colombianas. Fuente: SNIES."),
             (mc3, "⚡", f"{float(fila['empleo_energia_miles']):.2f} K",
-             "Empleo en Energía", "Miles de trabajadores",      C["gold"]),
+             "Empleo en Energía", "Miles de trabajadores", C["gold"],
+             "Personas ocupadas formalmente en el sector de suministro de electricidad y gas, expresado en miles de trabajadores. Fuente: DANE-GEIH."),
             (mc4, "📉", f"{float(fila['tasa_desempleo_pais']):.2f}%",
-             "Tasa de Desempleo", "Total nacional · DANE",      C["red"]),
+             "Tasa de Desempleo", "Total nacional · DANE", C["red"],
+             "Porcentaje de la población económicamente activa que busca empleo sin encontrarlo. Se incluye como contexto macroeconómico nacional. Fuente: DANE."),
         ]:
             with col:
-                st.markdown(_card_metrica(ico, val, lbl, sub, color), unsafe_allow_html=True)
+                st.markdown(_card_metrica(ico, val, lbl, sub, color, exp), unsafe_allow_html=True)
 
-    st.markdown('<div style="height:1rem"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:0.5rem"></div>', unsafe_allow_html=True)
 
     if not df_coev.empty:
         _ph_coev = st.empty()
@@ -489,7 +501,17 @@ with tab1:
         f"<b>r = {modelo['r']:.4f}</b> y <b>R² = {modelo['r2']:.4f}</b> — ver pestaña Modelo.",
     ), unsafe_allow_html=True)
 
+    st.markdown('<div style="height:2rem"></div>', unsafe_allow_html=True)
+
     with st.expander("🔍 Ver tabla de datos completa"):
+        st.markdown(
+            '<p style="font-size:0.8rem;color:#94A3B8;margin:0">'
+            'Serie histórica semestral con los cuatro indicadores cruzados del modelo: '
+            'porcentaje de energía limpia (XM), estudiantes STEM matriculados (SNIES), '
+            'empleo formal en el sector energético y tasa de desempleo nacional (DANE-GEIH).</p>'
+            '<div style="height:1rem"></div>',
+            unsafe_allow_html=True,
+        )
         st.dataframe(df_coev.rename(columns={
             "year": "Año", "semester": "Semestre",
             "porcentaje_energia_limpia": "% Energía Limpia",
@@ -498,13 +520,13 @@ with tab1:
             "tasa_desempleo_pais": "Tasa Desempleo %",
         }), use_container_width=True, hide_index=True)
 
-    # ── Diagnóstico de tipos de energía ──────────────────────────────────────
-    with st.expander("🔧 Diagnóstico: tipos de energía en la BD (abre si Energía Limpia = 0%)"):
+    with st.expander("🔧 Diagnóstico: tipos de energía en la BD"):
         st.markdown(
-            '<p style="font-size:0.8rem;color:#94A3B8;margin-bottom:0.5rem">'
-            'Esta tabla muestra los valores exactos de <code>resource_type</code> '
-            'que cargó el ETL de XM en Supabase. Si el porcentaje de energía limpia '
-            'es 0%, verifica que los tipos renovables aparezcan aquí y ajusta el filtro.</p>',
+            '<p style="font-size:0.8rem;color:#94A3B8;margin:0">'
+            'Fuentes de generación eléctrica registradas por XM S.A. E.S.P. en el Mercado de Energía '
+            'Mayorista de Colombia. Cada fila corresponde a un tipo de recurso con su volumen total '
+            'generado en el periodo 2022-2024, expresado en gigavatios-hora (GWh).</p>'
+            '<div style="height:1rem"></div>',
             unsafe_allow_html=True,
         )
         try:
@@ -519,8 +541,7 @@ with tab1:
                     use_container_width=True,
                     hide_index=True,
                 )
-                # Alerta si no hay tipos limpios reconocidos
-                tipos = df_diag["resource_type"].str.upper().tolist()
+                tipos   = df_diag["resource_type"].str.upper().tolist()
                 limpios = [t for t in tipos if any(
                     k in t for k in ["HIDRAUL","SOLAR","EOLIC","MENORES","BIOMASA","BAGAZO","GEOTERM","RENOVABLE"]
                 )]
@@ -536,6 +557,7 @@ with tab1:
                 st.info("La tabla fact_energy está vacía.")
         except Exception as e:
             st.error(f"Error al consultar tipos: {e}")
+
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -737,7 +759,7 @@ st.markdown(
     '⚡ <b style="color:#475569">Coevolución STEM–Energía · Colombia 2022-2024</b>'
     ' &nbsp;|&nbsp; 👩‍💻 <b style="color:#475569">Camila Acosta &amp; Cristian Robledo</b>'
     ' &nbsp;|&nbsp; 🏫 <b style="color:#475569">Talento Tech</b>'
-    ' &nbsp;|&nbsp; SNIES · XM · DANE–GEIH · Banco Mundial · Mayo 2026'
+    ' &nbsp;|&nbsp; SNIES · XM · DANE–GEIH · Banco Mundial · Jun 2026'
     '</div>',
     unsafe_allow_html=True,
 )
