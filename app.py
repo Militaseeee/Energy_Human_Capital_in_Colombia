@@ -62,7 +62,7 @@ p, button, input, select, textarea,
 /* ── Fondos ── */
 [data-testid="stAppViewContainer"] { background: #020817 !important; }
 [data-testid="stHeader"]           { background: transparent !important; }
-.main .block-container { padding-top: 0.8rem; padding-bottom: 2.5rem; max-width: 1300px; }
+.main .block-container { padding: 0.8rem 1rem 0.8rem; max-width: 1300px; }
 
 /* ── st.metric — tarjetas compactas para grid 2×2 ── */
 div[data-testid="metric-container"] {
@@ -133,6 +133,9 @@ div[data-testid="stMetricDelta"] > div {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #0F172A; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* ── Espaciado entre bloques verticales ── */
+[data-testid="stVerticalBlock"] { gap: 0.5rem !important; }
 
 /* ── Ocultar UI de Streamlit ── */
 #MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden; }
@@ -263,7 +266,7 @@ with col_left:
         '<div style="background:radial-gradient(ellipse at 10% 50%,'
         'rgba(34,211,238,0.12) 0%,transparent 65%);padding:0.5rem 0 1rem 0">'
         '<div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;'
-        'letter-spacing:0.2em;color:#334155;margin-bottom:0.75rem">'
+        'letter-spacing:0.2em;color:#334155">'
         '🇨🇴 &nbsp;Minería de Datos &nbsp;·&nbsp; Serie Histórica 2022-2024</div>'
         '<h1 style="font-size:2.75rem;font-weight:900;line-height:1.1;'
         'letter-spacing:-0.03em;margin:0 0 0.75rem 0;'
