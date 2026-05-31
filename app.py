@@ -497,7 +497,7 @@ with tab1:
         _ph_coev.markdown(_skeleton(460), unsafe_allow_html=True)
         _ph_coev.plotly_chart(chart_coevolucion(df_coev), use_container_width=True)
         st.markdown(
-            '<div style="display:flex;justify-content:flex-start;margin-top:0.5rem">'
+            '<div style="margin-top:-2.3rem;padding-left:0.5rem;padding-bottom:2rem">'
             '<details>'
             '<summary style="list-style:none;width:26px;height:26px;border-radius:50%;'
             'background:#1E293B;border:1px solid #334155;display:flex;align-items:center;'
@@ -517,8 +517,6 @@ with tab1:
             '</details></div>',
             unsafe_allow_html=True,
         )
-
-    st.markdown('<div style="height:2rem"></div>', unsafe_allow_html=True)
 
     st.markdown(_insight(
         "¿Qué nos dice el gráfico?",
