@@ -1,0 +1,9 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Tema oscuro nativo de Streamlit
+# Afecta: fondo, tarjetas, texto, inputs, sliders y botones
+# ──────────────────────────────────────────────────────────────────────────────
+[theme]
+primaryColor             = "#22D3EE"
+backgroundColor          = "#020817"
+secondaryBackgroundColor = "#0F172A"
+textColor                = "#F1F5F9"

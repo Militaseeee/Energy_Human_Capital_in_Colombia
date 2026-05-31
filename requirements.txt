@@ -1,0 +1,20 @@
+# ─── Core web framework ───────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ─── Base de datos ────────────────────────────────────────────────────────────
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+
+# ─── Análisis de datos ────────────────────────────────────────────────────────
+pandas>=2.0.0
+numpy>=1.26.0
+scipy>=1.13.0
+
+# ─── Visualizaciones interactivas ─────────────────────────────────────────────
+plotly>=5.22.0
+
+# ─── GeoJSON para mapa coroplético de Colombia ────────────────────────────────
+requests>=2.31.0
+
+# ─── Lectura de archivos Excel (carga ETL original) ──────────────────────────
+openpyxl>=3.1.0
