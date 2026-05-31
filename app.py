@@ -153,7 +153,10 @@ div[data-testid="stMetricDelta"] > div {
 }
 
 /* ── Ocultar UI de Streamlit ── */
-#MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden; }
+#MainMenu, footer,
+[data-testid="stToolbar"],
+[data-testid="stToolbarActions"],
+[data-testid="stDecoration"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -487,12 +490,35 @@ with tab1:
             with col:
                 st.markdown(_card_metrica(ico, val, lbl, sub, color, exp), unsafe_allow_html=True)
 
-    st.markdown('<div style="height:0.5rem"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:2rem"></div>', unsafe_allow_html=True)
 
     if not df_coev.empty:
         _ph_coev = st.empty()
         _ph_coev.markdown(_skeleton(460), unsafe_allow_html=True)
         _ph_coev.plotly_chart(chart_coevolucion(df_coev), use_container_width=True)
+        st.markdown(
+            '<div style="display:flex;justify-content:flex-start;margin-top:0.5rem">'
+            '<details>'
+            '<summary style="list-style:none;width:26px;height:26px;border-radius:50%;'
+            'background:#1E293B;border:1px solid #334155;display:flex;align-items:center;'
+            'justify-content:center;cursor:pointer;font-size:0.72rem;font-weight:700;'
+            'color:#94A3B8;outline:none;user-select:none">ℹ</summary>'
+            '<div style="background:#0F172A;border:1px solid #334155;border-radius:12px;'
+            'padding:1rem 1.2rem;margin-top:0.5rem;'
+            'font-size:0.78rem;color:#94A3B8;line-height:1.65;'
+            'box-shadow:0 4px 20px rgba(0,0,0,0.5)">'
+            '<b style="color:#F1F5F9;font-size:0.82rem">📊 ¿Qué muestra este gráfico?</b>'
+            '<br><br>Evolución paralela del <b style="color:#60A5FA">Talento STEM</b> '
+            '(eje izquierdo) y el <b style="color:#FBBF24">Empleo en Energía</b> '
+            '(eje derecho) durante los 6 semestres 2022-2024. El área azul refleja '
+            'el crecimiento de matrículas universitarias; la línea dorada muestra '
+            'la absorción laboral en el sector eléctrico colombiano. Su sincronía '
+            'evidencia la coevolución cuantificada por el modelo OLS.</div>'
+            '</details></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown('<div style="height:2rem"></div>', unsafe_allow_html=True)
 
     st.markdown(_insight(
         "¿Qué nos dice el gráfico?",
