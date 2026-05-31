@@ -137,6 +137,21 @@ div[data-testid="stMetricDelta"] > div {
 /* ── Espaciado entre bloques verticales ── */
 [data-testid="stVerticalBlock"] { gap: 0.5rem !important; }
 
+/* ── Fade-in suave en gráficos y mapa al renderizar ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+[data-testid="stPlotlyChart"],
+[data-testid="stMetric"],
+[data-testid="stMarkdownContainer"] > div {
+    animation: fadeUp 0.45s ease both;
+}
+
 /* ── Ocultar UI de Streamlit ── */
 #MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden; }
 </style>
@@ -179,6 +194,20 @@ def _card_metrica(icon: str, value: str, label: str, sublabel: str, color: str) 
         f'<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:0.07em;color:#F1F5F9;margin-top:0.5rem">{label}</div>'
         f'<div style="font-size:0.7rem;color:#64748B;margin-top:0.12rem">{sublabel}</div>'
+        f'</div>'
+    )
+
+def _skeleton(height: int = 400) -> str:
+    return (
+        f'<div style="background:#0F172A;border-radius:16px;height:{height}px;'
+        f'position:relative;overflow:hidden;border:1px solid #1E293B">'
+        f'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">'
+        f'<div style="font-size:1.8rem;opacity:0.25">⚡</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;letter-spacing:0.14em;color:#334155;margin-top:0.4rem">CARGANDO</div>'
+        f'</div>'
+        f'<div style="position:absolute;inset:0;background:linear-gradient(90deg,'
+        f'transparent 0%,rgba(34,211,238,0.06) 50%,transparent 100%);'
+        f'animation:shimmer 1.6s ease-in-out infinite"></div>'
         f'</div>'
     )
 
@@ -339,11 +368,13 @@ with col_right:
 
     # ── Mapa coroplético interactivo ──────────────────────────────────────────
     st.markdown('<div style="margin-top:0.35rem"></div>', unsafe_allow_html=True)
+    _ph_hero = st.empty()
+    _ph_hero.markdown(_skeleton(450), unsafe_allow_html=True)
     fig_hero = chart_mapa_colombia(df_mapa, height=450, show_title=False)
     if fig_hero is not None:
-        st.plotly_chart(fig_hero, use_container_width=True)
+        _ph_hero.plotly_chart(fig_hero, use_container_width=True)
     else:
-        st.markdown(
+        _ph_hero.markdown(
             '<div style="background:#0F172A;border:1px dashed #334155;'
             'border-radius:16px;padding:3rem;text-align:center;color:#475569">'
             '🗺️ Mapa no disponible sin conexión a internet</div>',
@@ -447,7 +478,9 @@ with tab1:
     st.markdown('<div style="height:1rem"></div>', unsafe_allow_html=True)
 
     if not df_coev.empty:
-        st.plotly_chart(chart_coevolucion(df_coev), use_container_width=True)
+        _ph_coev = st.empty()
+        _ph_coev.markdown(_skeleton(460), unsafe_allow_html=True)
+        _ph_coev.plotly_chart(chart_coevolucion(df_coev), use_container_width=True)
 
     st.markdown(_insight(
         "¿Qué nos dice el gráfico?",
@@ -530,11 +563,13 @@ with tab2:
 
     _divider()
 
+    _ph_mapa2 = st.empty()
+    _ph_mapa2.markdown(_skeleton(580), unsafe_allow_html=True)
     fig_mapa_t2 = chart_mapa_colombia(df_mapa, height=580, show_title=True)
     if fig_mapa_t2 is not None:
-        st.plotly_chart(fig_mapa_t2, use_container_width=True)
+        _ph_mapa2.plotly_chart(fig_mapa_t2, use_container_width=True)
     else:
-        st.info("⚠️ Sin conexión — mostrando distribución alternativa.")
+        _ph_mapa2.info("⚠️ Sin conexión — mostrando distribución alternativa.")
 
     _divider()
 
@@ -543,7 +578,9 @@ with tab2:
     with col_dona:
         st.markdown('<p style="font-size:0.83rem;font-weight:600;color:#94A3B8;margin-bottom:0.3rem">Participación % por Macro-Región</p>', unsafe_allow_html=True)
         if not df_reg.empty:
-            st.plotly_chart(chart_distribucion_regional(df_reg), use_container_width=True)
+            _ph_dona = st.empty()
+            _ph_dona.markdown(_skeleton(400), unsafe_allow_html=True)
+            _ph_dona.plotly_chart(chart_distribucion_regional(df_reg), use_container_width=True)
 
     with col_det:
         st.markdown('<p style="font-size:0.83rem;font-weight:600;color:#94A3B8;margin-bottom:0.5rem">🔎 Detalle por Región</p>', unsafe_allow_html=True)
@@ -662,12 +699,16 @@ with tab3:
         st.markdown('<p style="font-size:0.85rem;font-weight:600;color:#94A3B8;margin-bottom:0.2rem">📉 Recta de Regresión OLS</p>', unsafe_allow_html=True)
         df_mod = modelo["df"]
         if not df_mod.empty:
-            st.plotly_chart(chart_regresion(df_mod, modelo["slope"], modelo["intercept"]), use_container_width=True)
+            _ph_ols = st.empty()
+            _ph_ols.markdown(_skeleton(420), unsafe_allow_html=True)
+            _ph_ols.plotly_chart(chart_regresion(df_mod, modelo["slope"], modelo["intercept"]), use_container_width=True)
 
     with col_top:
         st.markdown('<p style="font-size:0.85rem;font-weight:600;color:#94A3B8;margin-bottom:0.2rem">🏆 Top 10 Áreas de Conocimiento STEM</p>', unsafe_allow_html=True)
         if not df_top.empty:
-            st.plotly_chart(chart_top_areas(df_top), use_container_width=True)
+            _ph_top = st.empty()
+            _ph_top.markdown(_skeleton(520), unsafe_allow_html=True)
+            _ph_top.plotly_chart(chart_top_areas(df_top), use_container_width=True)
 
     ta, tb = st.columns(2)
     with ta:
