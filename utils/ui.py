@@ -121,7 +121,9 @@ div[data-testid="stMetricDelta"] > div {
 #MainMenu, footer,
 [data-testid="stToolbar"],
 [data-testid="stToolbarActions"],
-[data-testid="stDecoration"] { display: none !important; }
+[data-testid="stToolbarActionButton"],
+[data-testid="stDecoration"],
+[data-testid="stHeader"] { display: none !important; }
 </style>
 """
 

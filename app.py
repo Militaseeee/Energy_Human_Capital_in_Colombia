@@ -26,6 +26,7 @@ from queries.analytics import (
     get_top_areas_conocimiento,
     get_modelo_estadistico,
 )
+import pandas as pd
 
 # ── Componentes (frontend) ────────────────────────────────────────────────────
 from components.hero import render_hero
@@ -41,8 +42,6 @@ from components.tab_modelo import render_tab_modelo
 def _cargar_todo():
     return (
         get_coevolucion_nacional(),
-        get_distribucion_regional(1),
-        get_distribucion_regional(2),
         get_mapa_colombia(),
         get_top_areas_conocimiento(),
         get_modelo_estadistico(),
@@ -63,7 +62,7 @@ display:flex;flex-direction:column;align-items:center;justify-content:center;gap
 """, unsafe_allow_html=True)
 
 try:
-    df_coev, df_s1, df_s2, df_mapa, df_top, modelo = _cargar_todo()
+    df_coev, df_mapa, df_top, modelo = _cargar_todo()
     st.toast("Datos cargados ✓", icon="⚡")
 except Exception as exc:
     _loader.empty()
@@ -89,13 +88,19 @@ s1_label = f"S{int(s1['semester'])}·{int(s1['year'])}" if s1 is not None else "
 s2_label = f"S{int(s2['semester'])}·{int(s2['year'])}" if s2 is not None else "—"
 
 
-def _get_pct(df, region_substr: str) -> float:
+def _get_pct(df: pd.DataFrame, region_substr: str) -> float:
     mask = df["macro_region"].str.contains(region_substr, na=False)
     return float(df.loc[mask, "porcentaje_participacion_talento"].iloc[0]) if mask.any() else 0.0
 
 
-pct_andina = _get_pct(df_s1, "Andina")
-pct_caribe  = _get_pct(df_s1, "Caribe")
+# Carga el periodo más reciente disponible para los KPIs del hero
+_ultimo = df_coev.iloc[-1] if not df_coev.empty else None
+_year_ref    = int(_ultimo["year"])    if _ultimo is not None else 2024
+_sem_ref     = int(_ultimo["semester"]) if _ultimo is not None else 1
+_df_ref = get_distribucion_regional(_year_ref, _sem_ref)
+
+pct_andina = _get_pct(_df_ref, "Andina")
+pct_caribe  = _get_pct(_df_ref, "Caribe")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -113,7 +118,7 @@ with tab1:
     render_tab_coevolucion(df_coev, modelo)
 
 with tab2:
-    render_tab_regional(df_s1, df_s2, df_mapa, pct_andina, pct_caribe)
+    render_tab_regional(df_coev, df_mapa, pct_andina, pct_caribe)
 
 with tab3:
     render_tab_modelo(modelo, df_top)
@@ -128,7 +133,7 @@ st.markdown(
     '⚡ <b style="color:#475569">Coevolución STEM–Energía · Colombia 2022-2024</b>'
     ' &nbsp;|&nbsp; 👩‍💻 <b style="color:#475569">Camila Acosta &amp; Cristian Robledo</b>'
     ' &nbsp;|&nbsp; 🏫 <b style="color:#475569">Talento Tech</b>'
-    ' &nbsp;|&nbsp; SNIES · XM · DANE–GEIH · Banco Mundial · Jun 2026'
+    ' &nbsp;|&nbsp; <span style="color:#475569">SNIES · XM · DANE–GEIH · Banco Mundial · Jun 2026</span>'
     '</div>',
     unsafe_allow_html=True,
 )

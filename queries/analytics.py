@@ -93,9 +93,8 @@ def get_coevolucion_nacional() -> pd.DataFrame:
     """
     sql = text("""
         WITH data_energia AS (
-            -- Porcentaje global de energía limpia — evita el mismatch de time_id
-            -- entre fact_energy (posiblemente diario) y dim_time (semestral).
             SELECT
+                fe.time_id,
                 ROUND(
                     SUM(CASE
                         WHEN resource_type ILIKE '%HIDRAUL%'
@@ -111,7 +110,10 @@ def get_coevolucion_nacional() -> pd.DataFrame:
                     / NULLIF(SUM(generation_kwh)::numeric, 0),
                     2
                 ) AS porcentaje_energia_limpia
-            FROM fact_energy
+            FROM fact_energy fe
+            INNER JOIN dim_time t ON t.time_id = fe.time_id
+            WHERE t.year IN (2022, 2023, 2024)
+            GROUP BY fe.time_id
         ),
         data_educacion AS (
             SELECT
@@ -133,13 +135,14 @@ def get_coevolucion_nacional() -> pd.DataFrame:
         SELECT
             t.year,
             t.semester,
-            (SELECT porcentaje_energia_limpia FROM data_energia)              AS porcentaje_energia_limpia,
-            COALESCE(ed.estudiantes_stem, 0)                                  AS total_talento_stem,
-            ROUND(COALESCE(em.ocupados_sector_miles::numeric, 0), 2)          AS empleo_energia_miles,
-            ROUND(COALESCE(em.tasa_desempleo_general::numeric, 0), 2)         AS tasa_desempleo_pais
+            ROUND(COALESCE(en.porcentaje_energia_limpia, 0), 2)               AS porcentaje_energia_limpia,
+            COALESCE(ed.estudiantes_stem, 0)                                   AS total_talento_stem,
+            ROUND(COALESCE(em.ocupados_sector_miles::numeric, 0), 2)           AS empleo_energia_miles,
+            ROUND(COALESCE(em.tasa_desempleo_general::numeric, 0), 2)          AS tasa_desempleo_pais
         FROM dim_time t
-        LEFT JOIN data_educacion ed ON ed.time_id = t.time_id
-        LEFT JOIN data_empleo    em ON em.time_id = t.time_id
+        LEFT JOIN data_energia    en ON en.time_id = t.time_id
+        LEFT JOIN data_educacion  ed ON ed.time_id = t.time_id
+        LEFT JOIN data_empleo     em ON em.time_id = t.time_id
         WHERE t.year IN (2022, 2023, 2024)
         ORDER BY t.year, t.semester;
     """)
@@ -152,10 +155,10 @@ def get_coevolucion_nacional() -> pd.DataFrame:
 # ─────────────────────────────────────────────────────────────────────────────
 
 @st.cache_data(ttl=600, show_spinner="🗺️ Cargando Distribución Regional…")
-def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
+def get_distribucion_regional(year: int, semester: int) -> pd.DataFrame:
     """
     Participación porcentual del talento STEM por macro-región
-    para el semestre indicado (1 o 2) del año 2023.
+    para un año y semestre específicos (ej. 2023, 1).
     """
     sql = text("""
         SELECT
@@ -168,7 +171,7 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
                     (SELECT SUM(fe2.stem_enrolled)
                      FROM   fact_education fe2
                      INNER JOIN dim_time t2 ON t2.time_id = fe2.time_id
-                     WHERE  t2.year IN (2022, 2023, 2024)
+                     WHERE  t2.year = :year
                        AND  t2.semester = :semester),
                     0
                 ) * 100,
@@ -177,13 +180,13 @@ def get_distribucion_regional(semester: int = 1) -> pd.DataFrame:
         FROM dim_time t
         INNER JOIN fact_education ed ON ed.time_id = t.time_id
         INNER JOIN dim_region r      ON r.region_id = ed.region_id
-        WHERE t.year IN (2022, 2023, 2024)
+        WHERE t.year = :year
           AND t.semester = :semester
-        GROUP BY r.region_name, ed.time_id
+        GROUP BY r.region_name
         ORDER BY estudiantes_matriculados DESC;
     """)
     with get_engine().connect() as conn:
-        return pd.read_sql_query(sql, conn, params={"semester": semester})
+        return pd.read_sql_query(sql, conn, params={"year": year, "semester": semester})
 
 
 @st.cache_data(ttl=600, show_spinner="🗺️ Cargando datos para mapa de Colombia…")
