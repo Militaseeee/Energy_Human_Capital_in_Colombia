@@ -4,6 +4,8 @@ components/tab_modelo.py
 Tab 3 — Modelo Estadístico (Pearson + OLS).
 """
 
+import textwrap
+
 import streamlit as st
 
 from utils.ui import divider, insight, alert, kpi_card, skeleton
@@ -37,16 +39,50 @@ def render_tab_modelo(modelo: dict, df_top) -> None:
 
     with col_eq:
         st.markdown(
-            '<div style="background:#0F172A;border:1px solid #1E293B;border-radius:16px;padding:1.8rem;text-align:center">'
-            '<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#22D3EE;margin-bottom:0.8rem">📐 Ecuación del Modelo OLS</div>',
-            unsafe_allow_html=True,
-        )
-        st.latex(rf"Y = {modelo['slope']:.6f} \cdot X + ({modelo['intercept']:.2f})")
-        st.markdown(
-            '<div style="font-size:0.78rem;color:#475569;margin-top:0.6rem;line-height:1.5">'
-            '<b style="color:#64748B">X</b> = Estudiantes STEM matriculados<br>'
-            '<b style="color:#64748B">Y</b> = Empleo Sector Energía (miles)'
-            '</div></div>',
+            textwrap.dedent("""
+            <div style="background: #0F172A;
+                        border-radius: 16px;
+                        border-left: 5px solid #22D3EE;
+                        padding: 2rem;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        border-top: 1px solid #1E293B;
+                        border-right: 1px solid #1E293B;
+                        border-bottom: 1px solid #1E293B;">
+            <div style="position: absolute; top: 0; left: 0;
+                        background: #22D3EE; color: #020817;
+                        padding: 0.4rem 1.2rem;
+                        border-radius: 14px 0 14px 0;
+                        font-weight: 900; font-size: 0.72rem;
+                        letter-spacing: 0.1em; text-transform: uppercase;">
+                📐 Estructura Matemática
+            </div>
+            <div style="margin-top: 1rem; padding: 1.5rem;
+                        background: #020817;
+                        border: 1px dashed #334155;
+                        border-radius: 12px;
+                        text-align: center;">
+                <span style="font-size: 1.8rem; font-weight: 900; color: #F1F5F9; letter-spacing: 0.02em;">
+                Y = <span style="color: #EAB308;">{slope}</span> &middot; X + <span style="color: #A78BFA;">({intercept})</span>
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid #1E293B;">
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <div style="width: 24px; height: 4px; background: #EAB308; border-radius: 2px; margin-bottom: 0.5rem;"></div>
+                <span style="color: #E2E8F0; font-weight: 700; font-size: 0.85rem;">Variable X</span>
+                <span style="color: #64748B; font-size: 0.75rem; font-weight: 600; margin-top: 0.2rem;">Talento STEM<br>(Matriculados)</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <div style="width: 24px; height: 4px; background: #A78BFA; border-radius: 2px; margin-bottom: 0.5rem;"></div>
+                <span style="color: #E2E8F0; font-weight: 700; font-size: 0.85rem;">Variable Y</span>
+                <span style="color: #64748B; font-size: 0.75rem; font-weight: 600; margin-top: 0.2rem;">Empleo Energía<br>(Miles)</span>
+                </div>
+            </div>
+            </div>
+            """).strip().format(slope=f"{modelo['slope']:.6f}", intercept=f"{modelo['intercept']:.2f}"),
             unsafe_allow_html=True,
         )
 
