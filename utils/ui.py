@@ -124,6 +124,93 @@ div[data-testid="stMetricDelta"] > div {
 [data-testid="stToolbarActionButton"],
 [data-testid="stDecoration"],
 [data-testid="stHeader"] { display: none !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE — MÓVIL  (≤ 768 px)
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Sin scroll horizontal */
+    body, .stApp { overflow-x: hidden !important; }
+
+    /* Padding lateral reducido */
+    [data-testid="stMainBlockContainer"] {
+        padding: 0.6rem 0.7rem 4rem !important;
+    }
+
+    /* ── Apilar TODAS las columnas en vertical ── */
+    [data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+    [data-testid="stColumn"] {
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    /* ── Excepción: fila de 4 KPIs → cuadrícula 2×2 ── */
+    [data-testid="stHorizontalBlock"]:has(
+        > [data-testid="stColumn"]:nth-child(4)
+    ) > [data-testid="stColumn"] {
+        min-width: calc(50% - 0.35rem) !important;
+        flex: 1 1 calc(50% - 0.35rem) !important;
+    }
+
+    /* ── Título hero ── */
+    h1 {
+        font-size: 1.75rem !important;
+        line-height: 1.2 !important;
+    }
+
+    /* ── Métricas más compactas ── */
+    div[data-testid="stMetricValue"] > div { font-size: 1.05rem !important; }
+    div[data-testid="stMetricLabel"] > div { font-size: 0.58rem !important; }
+    div[data-testid="stMetricDelta"] > div { font-size: 0.58rem !important; }
+    div[data-testid="metric-container"]    { padding: 0.6rem 0.4rem !important; }
+
+    /* ── Tabs: scroll horizontal, sin salto de línea ── */
+    .stTabs [data-baseweb="tab-list"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none !important; }
+    .stTabs [data-baseweb="tab"] {
+        font-size: 0.7rem !important;
+        padding: 0.4rem 0.75rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* ── Gráficos: altura reducida para no ocupar pantalla completa ── */
+    [data-testid="stPlotlyChart"] { min-height: unset !important; }
+
+    /* ── Gap vertical entre bloques ── */
+    [data-testid="stVerticalBlock"] { gap: 0.4rem !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE — TABLET  (769 px – 1024 px)
+   ───────────────────────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+    }
+
+    /* Fila de 4 KPIs → 2×2 también en tablet */
+    [data-testid="stHorizontalBlock"]:has(
+        > [data-testid="stColumn"]:nth-child(4)
+    ) > [data-testid="stColumn"] {
+        min-width: calc(50% - 0.5rem) !important;
+        flex: 1 1 calc(50% - 0.5rem) !important;
+    }
+
+    [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; }
+
+    h1 { font-size: 2.1rem !important; }
+}
 </style>
 """
 
