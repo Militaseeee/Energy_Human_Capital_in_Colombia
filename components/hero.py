@@ -55,17 +55,17 @@ def render_hero(df_mapa, s1, s2, modelo, pct_andina: float, pct_caribe: float,
             'SNIES &nbsp;·&nbsp; XM S.A. E.S.P. &nbsp;·&nbsp; '
             'DANE–GEIH &nbsp;·&nbsp; Banco Mundial</span>'
             '</div>'
-            '<div style="height:1px;background:linear-gradient(to right,'
+            '<div class="hero-desktop-extra" style="height:1px;background:linear-gradient(to right,'
             '#1E293B,#22D3EE44,#1E293B);margin:1.5rem 0 1.1rem"></div>'
-            '<div style="margin-bottom:0.5rem">'
-            '<div style="font-size:1.1rem;font-weight:700;color:#22D3EE;margin-top:2rem;margin-bottom:1rem">'
+            '<div class="hero-desktop-extra" style="margin-bottom:0.5rem">'
+            '<div style="font-size:1.1rem;font-weight:700;color:#22D3EE;margin-top:0.5rem;margin-bottom:0.8rem">'
             '🗺️ ¿Qué muestra el mapa?</div>'
-            '<div style="font-size:0.77rem;color:#64748B;line-height:1.6;margin-bottom:2rem">'
+            '<div style="font-size:0.77rem;color:#64748B;line-height:1.6;margin-bottom:1rem">'
             'Cada departamento está coloreado según su macro-región natural. '
             'El color refleja la concentración del talento STEM universitario '
             'en el territorio colombiano.</div>'
             '</div>'
-            f'<div data-hero-legend>{_leg_html}</div>',
+            f'<div class="hero-desktop-extra" data-hero-legend>{_leg_html}</div>',
             unsafe_allow_html=True,
         )
 
