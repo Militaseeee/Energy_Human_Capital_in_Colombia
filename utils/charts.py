@@ -129,7 +129,7 @@ def chart_mapa_colombia(
 
     title_cfg = (
         dict(
-            text="<b>🗺️ Distribución del Capital Humano STEM — Colombia 2023</b>",
+            text="<b>🗺️ Distribución del Capital Humano STEM — Colombia (2022-2024)</b>",
             x=0.5, xanchor="center",
             font=dict(size=15, color=C["text"]),
         )
@@ -156,7 +156,7 @@ def chart_mapa_colombia(
 # GRÁFICO 1 — Doble eje Y (Tab 1)
 # ─────────────────────────────────────────────────────────────────────────────
 def chart_coevolucion(df: pd.DataFrame) -> go.Figure:
-    periodos = [f"Semestre {int(s)} · 2023" for s in df["semester"]]
+    periodos = [f"Sem. {int(row['semester'])} · {int(row['year'])}" for _, row in df.iterrows()]
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
@@ -194,7 +194,7 @@ def chart_coevolucion(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         **_DARK,
         title=dict(
-            text="<b>Coevolución 2023 — Formación STEM ↔ Empleo Energético</b>",
+            text="<b>Coevolución (2022-2024) — Formación STEM ↔ Empleo Energético</b>",
             x=0.5, xanchor="center",
             font=dict(size=16, color=C["text"]),
         ),
@@ -225,8 +225,8 @@ def chart_coevolucion(df: pd.DataFrame) -> go.Figure:
 # ─────────────────────────────────────────────────────────────────────────────
 # GRÁFICO 2B — Dona fallback (Tab 2)
 # ─────────────────────────────────────────────────────────────────────────────
-def chart_distribucion_regional(df: pd.DataFrame) -> go.Figure:
-    pulls = [0.10 if "Andina" in str(r) else 0.0 for r in df["macro_region"]]
+def chart_distribucion_regional(df: pd.DataFrame, selected: str = "") -> go.Figure:
+    pulls = [0.06 if selected and selected in str(r) else 0.0 for r in df["macro_region"]]
 
     fig = px.pie(
         df,
@@ -281,7 +281,7 @@ def chart_top_areas(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         **_DARK,
         title=dict(
-            text="<b>🏆 Top 10 Áreas STEM · Colombia 2023</b>",
+            text="<b>🏆 Top 10 Áreas STEM · Colombia (2022-2024)</b>",
             x=0.5, xanchor="center", font=dict(size=14, color=C["text"]),
         ),
         xaxis_title="Total Estudiantes",
@@ -316,7 +316,7 @@ def chart_regresion(df: pd.DataFrame, slope: float, intercept: float) -> go.Figu
 
     fig.add_trace(go.Scatter(
         x=X, y=Y_real, mode="markers+text",
-        name="Datos reales 2023",
+        name="Datos reales (2022-2024)",
         text=periodos, textposition="top center",
         textfont=dict(size=12, color=C["teal"]),
         marker=dict(size=18, color=C["blue"], line=dict(color="#020817", width=3)),

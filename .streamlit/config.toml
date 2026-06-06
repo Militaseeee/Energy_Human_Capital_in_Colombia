@@ -2,6 +2,9 @@
 # Tema oscuro nativo de Streamlit
 # Afecta: fondo, tarjetas, texto, inputs, sliders y botones
 # ──────────────────────────────────────────────────────────────────────────────
+[client]
+toolbarMode = "viewer"
+
 [theme]
 primaryColor             = "#22D3EE"
 backgroundColor          = "#020817"
