@@ -133,15 +133,22 @@ div[data-testid="stMetricDelta"] > div {
     /* Sin scroll horizontal */
     body, .stApp { overflow-x: hidden !important; }
 
-    /* Padding lateral reducido */
-    [data-testid="stMainBlockContainer"] {
-        padding: 0.6rem 0.7rem 4rem !important;
+    /* Padding lateral — varios selectores para cubrir versiones de Streamlit */
+    [data-testid="stMainBlockContainer"],
+    .main .block-container,
+    section.main > div:first-child {
+        padding: 0.5rem 0.75rem 4rem !important;
+        max-width: 100% !important;
     }
+
+    /* ── Ocultar elementos verbosos del hero en móvil ── */
+    .hero-desktop-extra { display: none !important; }
 
     /* ── Apilar TODAS las columnas en vertical ── */
     [data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
+        row-gap: 0.4rem !important;
     }
     [data-testid="stColumn"] {
         min-width: 100% !important;
@@ -156,17 +163,18 @@ div[data-testid="stMetricDelta"] > div {
         flex: 1 1 calc(50% - 0.35rem) !important;
     }
 
-    /* ── Título hero ── */
+    /* ── Título hero más compacto ── */
     h1 {
-        font-size: 1.75rem !important;
+        font-size: 1.6rem !important;
         line-height: 1.2 !important;
+        margin-bottom: 0.5rem !important;
     }
 
-    /* ── Métricas más compactas ── */
-    div[data-testid="stMetricValue"] > div { font-size: 1.05rem !important; }
-    div[data-testid="stMetricLabel"] > div { font-size: 0.58rem !important; }
-    div[data-testid="stMetricDelta"] > div { font-size: 0.58rem !important; }
-    div[data-testid="metric-container"]    { padding: 0.6rem 0.4rem !important; }
+    /* ── Métricas compactas ── */
+    div[data-testid="stMetricValue"] > div { font-size: 1rem !important; }
+    div[data-testid="stMetricLabel"] > div { font-size: 0.56rem !important; }
+    div[data-testid="stMetricDelta"] > div { font-size: 0.56rem !important; }
+    div[data-testid="metric-container"]    { padding: 0.55rem 0.35rem !important; }
 
     /* ── Tabs: scroll horizontal, sin salto de línea ── */
     .stTabs [data-baseweb="tab-list"] {
@@ -177,16 +185,22 @@ div[data-testid="stMetricDelta"] > div {
     }
     .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none !important; }
     .stTabs [data-baseweb="tab"] {
-        font-size: 0.7rem !important;
-        padding: 0.4rem 0.75rem !important;
+        font-size: 0.68rem !important;
+        padding: 0.38rem 0.65rem !important;
         white-space: nowrap !important;
     }
 
-    /* ── Gráficos: altura reducida para no ocupar pantalla completa ── */
+    /* ── Gráficos ── */
     [data-testid="stPlotlyChart"] { min-height: unset !important; }
 
-    /* ── Gap vertical entre bloques ── */
-    [data-testid="stVerticalBlock"] { gap: 0.4rem !important; }
+    /* ── Gaps verticales ── */
+    [data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
+
+    /* ── Cards custom HTML: evitar desbordamiento ── */
+    [data-testid="stMarkdownContainer"] div[style] {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
