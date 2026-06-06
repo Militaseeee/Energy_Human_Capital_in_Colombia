@@ -51,7 +51,8 @@ def render_tab_modelo(modelo: dict, df_top) -> None:
                         justify-content: center;
                         border-top: 1px solid #1E293B;
                         border-right: 1px solid #1E293B;
-                        border-bottom: 1px solid #1E293B;">
+                        border-bottom: 1px solid #1E293B;
+                        margin: 0.8rem 0px;">
             <div style="position: absolute; top: 0; left: 0;
                         background: #22D3EE; color: #020817;
                         padding: 0.4rem 1.2rem;
@@ -109,7 +110,7 @@ def render_tab_modelo(modelo: dict, df_top) -> None:
 
     with col_ols:
         st.markdown(
-            '<p style="font-size:0.85rem;font-weight:600;color:#94A3B8;margin-bottom:0.2rem">'
+            '<p style="font-size:1rem;font-weight:700;color:#94A3B8;margin-top:1.4rem;margin-bottom:0.2rem">'
             '📉 Recta de Regresión OLS</p>',
             unsafe_allow_html=True,
         )
@@ -123,7 +124,7 @@ def render_tab_modelo(modelo: dict, df_top) -> None:
 
     with col_top:
         st.markdown(
-            '<p style="font-size:0.85rem;font-weight:600;color:#94A3B8;margin-bottom:0.2rem">'
+            '<p style="font-size:1rem;font-weight:700;color:#94A3B8;margin-top:1.4rem;margin-bottom:0.2rem">'
             '🏆 Top 10 Áreas de Conocimiento STEM</p>',
             unsafe_allow_html=True,
         )
