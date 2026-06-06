@@ -121,6 +121,28 @@ def render_tab_modelo(modelo: dict, df_top) -> None:
                 chart_regresion(df_mod, modelo["slope"], modelo["intercept"]),
                 use_container_width=True,
             )
+            st.markdown(
+                '<div style="margin-top: -2.3rem; padding-left: 0.5rem; padding-bottom: 2rem;">'
+                '<details>'
+                '<summary style="list-style: none; width: 26px; height: 26px; border-radius: 50%; '
+                'background: rgb(30, 41, 59); border: 1px solid rgb(51, 65, 85); '
+                'display: flex; align-items: center; justify-content: center; '
+                'cursor: pointer; font-size: 0.72rem; font-weight: 700; '
+                'color: rgb(148, 163, 184); outline: none; user-select: none;">ℹ</summary>'
+                '<div style="background: rgb(15, 23, 42); border: 1px solid rgb(51, 65, 85); '
+                'border-radius: 12px; padding: 1rem 1.2rem; margin-top: 0.5rem; '
+                'font-size: 0.78rem; color: rgb(148, 163, 184); line-height: 1.65; '
+                'box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 20px;">'
+                '<b style="color: rgb(241, 245, 249); font-size: 0.82rem;">📐 ¿Cómo leer este gráfico?</b><br><br>'
+                'Cada <b style="color: rgb(96, 165, 250);">punto azul</b> representa la "foto" de un semestre real. '
+                'La <b style="color: #EAB308;">línea punteada</b> es la tendencia proyectada. '
+                'La gráfica casi plana indica que, aunque la cantidad de estudiantes (eje horizontal) avanza a pasos agigantados, '
+                'la absorción de empleos (eje vertical) crece a un ritmo mucho más conservador.'
+                '</div>'
+                '</details>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
     with col_top:
         st.markdown(
