@@ -131,7 +131,7 @@ st.markdown(
     '<div style="margin-top:2rem;background:#0F172A;border:1px solid #1E293B;'
     'border-radius:14px;padding:1.1rem 2rem;text-align:center;font-size:0.78rem;color:#334155">'
     '⚡ <b style="color:#475569">Coevolución STEM–Energía · Colombia 2022-2024</b>'
-    ' &nbsp;|&nbsp; 👩‍💻 <b style="color:#475569">Camila Acosta &amp; Cristian Robledo</b>'
+    ' &nbsp;|&nbsp; 👩‍💻 <b style="color:#475569">Camila Acosta &amp; Cristian Robledo &amp Devinson Caceres</b>'
     ' &nbsp;|&nbsp; 🏫 <b style="color:#475569">Talento Tech</b>'
     ' &nbsp;|&nbsp; <span style="color:#475569">SNIES · XM · DANE–GEIH · Banco Mundial · Jun 2026</span>'
     '</div>',
