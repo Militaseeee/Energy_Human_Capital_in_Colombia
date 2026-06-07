@@ -2,7 +2,7 @@
 
 Dashboard ejecutivo interactivo que visualiza la sincronía entre la formación universitaria STEM y la absorción laboral en el sector eléctrico colombiano, construido con **Streamlit** y **Supabase**.
 
-> **Autores:** Camila Acosta & Cristian Robledo · Talento Tech · Mayo 2026
+> **Autores:** Camila Acosta, Cristian Robledo & Devinson Caceres · Talento Tech · Mayo 2026
 
 ---
 
